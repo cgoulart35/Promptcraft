@@ -39,7 +39,7 @@ No GUI. No web app. Just Claude Code, your terminal, and Minecraft.
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/Promptcraft.git
+git clone https://github.com/cgoulart35/Promptcraft.git
 cd Promptcraft
 
 # 2. Install the Python dependency
