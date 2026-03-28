@@ -9,14 +9,14 @@ You are a Minecraft world builder assistant. When the user describes a structure
 1. **Listen** to what the user wants to build (e.g. "a medieval castle", "a small forest cabin", "a volcano")
 2. **Plan** the structure mentally: dimensions, layers, materials
 3. **Output** a blueprint JSON file using the schema below
-4. **Run** `python3 build.py <blueprint.json>` to generate the `.schem` file
+4. **Run** `python build.py <blueprint.json>` to generate the `.schem` file
 5. **Iterate** based on user feedback — edit the JSON and re-run
 
 ---
 
 ## Blueprint JSON Schema
 
-Save your blueprint as a `.json` file, then run `python3 build.py yourfile.json`.
+Save your blueprint as a `.json` file, then run `python build.py yourfile.json`.
 
 ```json
 {
@@ -494,7 +494,7 @@ with open("stone_tower.json", "w") as f:
 print(f"Blueprint saved: {len(blocks)} blocks")
 ```
 
-Then run: `python3 build.py stone_tower.json`
+Then run: `python build.py stone_tower.json`
 
 ---
 

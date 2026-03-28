@@ -2,7 +2,7 @@
 
 **Describe it. Build it.**
 
-A Claude Code plugin that turns natural language into real Minecraft worlds. Tell Claude what you want to build — a medieval castle, a jungle temple, an underwater city — and get a `.schem` file you can paste directly into Minecraft.
+A Claude Code plugin that turns natural language into real Minecraft worlds. Tell Claude what you want to build — a medieval castle, a jungle temple, an underwater city — and get a `.schem` file pasted directly into your WorldEdit schematics folder.
 
 > Built for [Claude Code](https://claude.ai/code) · Outputs WorldEdit-compatible `.schem` files · Java Edition 1.21.1
 
@@ -10,16 +10,14 @@ A Claude Code plugin that turns natural language into real Minecraft worlds. Tel
 
 ## How It Works
 
-Promptcraft gives Claude Code a complete Minecraft building vocabulary — blocks, palettes, coordinate systems, and building strategies — so it can reason about 3D space and generate real structures.
-
 ```
-You: "Build me a dark fantasy castle with a moat, 40x40, nether brick walls"
-         ↓
-Claude Code reads CLAUDE.md, plans the structure layer by layer
-         ↓
-Writes a Python generator → runs build.py → outputs castle.schem
-         ↓
-You paste it into Minecraft with WorldEdit
+You:          /promptcraft:build a dark fantasy castle with a moat, nether brick, 40x40
+                          ↓
+Claude Code:  Plans the structure, writes a generator script, runs it
+                          ↓
+              Runs build.py → outputs castle.schem → copies to your schematics folder
+                          ↓
+You:          //schem load castle   then   //paste -a
 ```
 
 No GUI. No web app. Just Claude Code, your terminal, and Minecraft.
@@ -28,65 +26,83 @@ No GUI. No web app. Just Claude Code, your terminal, and Minecraft.
 
 ## Requirements
 
-- [Claude Code](https://claude.ai/code) installed and running
+- [Claude Code](https://claude.ai/code) installed
 - Python 3.8+
-- `mcschematic` Python library
-- Minecraft Java Edition with [WorldEdit](https://enginehub.org/worldedit/) mod
+- Minecraft Java Edition with [WorldEdit](https://enginehub.org/worldedit/) mod installed
+
+> `mcschematic` (the Python library that writes `.schem` files) is installed automatically by `/promptcraft:setup`.
 
 ---
 
 ## Installation
 
-```bash
-# 1. Clone the repo
-git clone https://github.com/cgoulart35/Promptcraft.git
-cd Promptcraft
+### 1. Add the Promptcraft plugin source
 
-# 2. Install the Python dependency
-pip install mcschematic
+In Claude Code, add this repository as a plugin source:
 
-# 3. Open Claude Code in this folder
-claude
+```
+/plugin source add https://github.com/cgoulart35/Promptcraft
 ```
 
-That's it. Claude will automatically read `CLAUDE.md` on startup and know how to build Minecraft structures.
+### 2. Install the plugin
+
+```
+/plugin install promptcraft
+```
+
+### 3. Run first-time setup
+
+```
+/promptcraft:setup
+```
+
+Setup will:
+- Verify Python 3.8+ is available
+- Install the `mcschematic` dependency
+- Ask for your WorldEdit schematics folder path and write `config.json`
+- Run a test build to confirm everything works end to end
+
+You can re-run `/promptcraft:setup` at any time to update your config or fix a broken install.
 
 ---
 
 ## Usage
 
-Once Claude Code is running in the Promptcraft folder, just describe what you want:
+Once setup is complete, describe what you want to build:
 
 ```
-> Build me a small medieval watchtower, stone brick, 7x7 base, 18 blocks tall
-  with battlements and interior floors
+/promptcraft:build a rustic forest cabin, spruce wood, fireplace inside
+/promptcraft:build an Egyptian pyramid, sandstone, hollow, 30 blocks tall
+/promptcraft:build a nether fortress outpost with a lava moat
+/promptcraft:build a floating sky island with a small house and waterfalls
 ```
 
 Claude will:
-1. Plan the structure and write a generator script
-2. Run `python3 build.py yourstructure.json`
-3. Save a `.schem` file to `./output/`
+1. Plan the structure (style, dimensions, materials)
+2. Write and run a Python generator script → `output/<name>.json`
+3. Run `build.py` → `output/<name>.schem`
+4. Auto-copy the `.schem` to your WorldEdit schematics folder
 
 Then in Minecraft:
-```
-# Copy the .schem to your WorldEdit schematics folder:
-# .minecraft/config/worldedit/schematics/
 
-//schem load watchtower
-//paste
 ```
+//schem load <name>
+//paste -a
+```
+
+(`-a` strips air blocks so the structure blends into your terrain)
 
 ---
 
 ## Example Prompts
 
 ```
+"A medieval stone keep, 20x20, inner courtyard, torches and battlements"
 "A rustic forest cabin, spruce wood, cozy interior with a fireplace"
-"An Egyptian pyramid, sandstone, 30 blocks tall, hollow interior with traps"
+"An Egyptian pyramid, sandstone, 30 blocks tall, hollow interior"
 "A floating sky island with a small house on top and waterfalls"
 "A nether fortress outpost, blackstone and nether brick, lava moat"
 "A modern glass-and-quartz office building, 20x20, 15 floors"
-"An underwater coral reef village with dome buildings"
 "A ruined stone temple overgrown with vines and moss"
 ```
 
@@ -94,11 +110,11 @@ Then in Minecraft:
 
 ## Try the Demo
 
-A working example is included — a full medieval watchtower:
+A working watchtower example is included:
 
 ```bash
-python3 example_watchtower.py   # generates watchtower.json
-python3 build.py watchtower.json  # outputs ./output/watchtower.schem
+python example_watchtower.py        # generates output/watchtower.json
+python build.py output/watchtower.json   # outputs output/watchtower.schem
 ```
 
 ---
@@ -107,17 +123,22 @@ python3 build.py watchtower.json  # outputs ./output/watchtower.schem
 
 ```
 Promptcraft/
-├── CLAUDE.md               ← The brain: teaches Claude how to build in Minecraft
-├── build.py                ← Executor: JSON blueprint → .schem file
-├── example_watchtower.py   ← Demo generator
-└── output/                 ← Generated .schem files go here
+├── .claude-plugin/
+│   └── plugin.json             ← Plugin manifest
+├── skills/
+│   ├── build/SKILL.md          ← /promptcraft:build <description>
+│   └── setup/SKILL.md          ← /promptcraft:setup
+├── CLAUDE.md                   ← Teaches Claude Minecraft's block vocabulary and building strategies
+├── build.py                    ← Executor: JSON blueprint → .schem file
+├── example_watchtower.py       ← Demo generator
+├── config.json                 ← Your local WorldEdit path (gitignored, created by /setup)
+├── requirements.txt            ← mcschematic
+└── output/                     ← All generated files land here (gitignored)
 ```
 
 ---
 
 ## Style Palettes
-
-Promptcraft ships with 6 built-in style palettes Claude can use:
 
 | Style | Vibe | Key Materials |
 |---|---|---|
@@ -134,10 +155,10 @@ Or just describe your own — Claude will figure out the materials.
 
 ## Roadmap
 
-- [ ] Terrain generation (hills, rivers, cliffs)
+- [ ] Terrain generation (hills, rivers, cliffs under structures)
 - [ ] Biome-aware builds (auto-match surrounding biome)
 - [ ] Interior furnishing (chests, crafting tables, beds placed contextually)
-- [ ] Village generation (multiple buildings + paths)
+- [ ] Village generation (multiple buildings + connecting paths)
 - [ ] Dungeon generation with loot tables
 - [ ] Bedrock Edition support
 
@@ -145,13 +166,13 @@ Or just describe your own — Claude will figure out the materials.
 
 ## Contributing
 
-PRs welcome. If you build something cool with Promptcraft, open an issue and show it off — we'd love to feature community builds.
+PRs welcome. If you build something cool with Promptcraft, open an issue and show it off.
 
 ---
 
 ## License
 
-MIT — build whatever you want with it.
+All rights reserved. This project is not currently licensed for redistribution or commercial use.
 
 ---
 

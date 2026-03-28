@@ -1,0 +1,13 @@
+# Personal config — contains your local paths
+config.json
+
+# Python virtual environment
+.venv/
+
+# Generated schematic output
+output/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

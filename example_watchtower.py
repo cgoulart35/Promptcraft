@@ -4,11 +4,12 @@ Example: Medieval Watchtower Generator
 Generates a blueprint JSON for a 7x7 medieval stone watchtower, 18 blocks tall,
 with battlements, windows, a wooden floor interior, and a torch-lit entrance.
 
-Run: python3 example_watchtower.py
-Then: python3 build.py watchtower.json
+Run: python example_watchtower.py
+Then: python build.py output/watchtower.json
 """
 
 import json
+import os
 
 blocks = []
 
@@ -57,7 +58,7 @@ for x in range(1, W - 1):
     for z in range(1, D - 1):
         add(x, 10, z, "minecraft:spruce_planks")
 
-# ─── Doorway: Y=1–2, center of south wall (z=0) ────────────────
+# ─── Doorway: Y=1–2, center of north wall (z=0) ────────────────
 door_x = W // 2  # x=3
 add(door_x, 1, 0, "minecraft:air")
 add(door_x, 2, 0, "minecraft:air")
@@ -113,16 +114,17 @@ for ly in range(1, H - 3):
 # ─── Output blueprint ──────────────────────────────────────────
 blueprint = {
     "name": "watchtower",
-    "description": f"Medieval stone watchtower — {W}×{D} base, {H} blocks tall, with battlements, windows, and interior floors",
+    "description": f"Medieval stone watchtower -- {W}x{D} base, {H} blocks tall, with battlements, windows, and interior floors",
     "version": "JE_1_21_1",
     "blocks": blocks
 }
 
-output_file = "watchtower.json"
+os.makedirs("output", exist_ok=True)
+output_file = "output/watchtower.json"
 with open(output_file, "w") as f:
     json.dump(blueprint, f, indent=2)
 
-print(f"✅ Blueprint generated: {output_file}")
+print(f"Blueprint generated: {output_file}")
 print(f"   Total blocks: {len(blocks)}")
-print(f"   Dimensions: {W}W × {H}H × {D}D")
-print(f"\nNext step: python3 build.py {output_file}")
+print(f"   Dimensions: {W}W x {H}H x {D}D")
+print(f"\nNext step: python build.py {output_file}")

@@ -1,29 +1,48 @@
 #!/usr/bin/env python3
 """
-Minecraft Map Builder — Blueprint Executor
+Minecraft Map Builder -- Blueprint Executor
 ==========================================
 Converts a Claude-generated JSON blueprint into a real Minecraft .schem file
 importable via WorldEdit (Java Edition).
 
 Usage:
-    python3 build.py <blueprint.json> [--output-dir <dir>]
+    python build.py <blueprint.json> [--output-dir <dir>]
 
 Example:
-    python3 build.py castle.json
-    python3 build.py tower.json --output-dir ~/minecraft/schematics
+    python build.py castle.json
+    python build.py tower.json --output-dir ~/minecraft/schematics
+
+Config:
+    Run /promptcraft:setup to create config.json with your schematics_dir.
+    build.py will auto-copy the .schem there after every build.
 """
 
 import argparse
 import json
 import os
+import shutil
 import sys
 import time
-from pathlib import Path
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_FILE = os.path.join(SCRIPT_DIR, "config.json")
+
+
+def load_config() -> dict:
+    """Load config.json if it exists. Returns empty dict if not found."""
+    if not os.path.exists(CONFIG_FILE):
+        return {}
+    try:
+        with open(CONFIG_FILE, "r") as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"WARNING: config.json is invalid JSON: {e} -- ignoring config")
+        return {}
 
 try:
     import mcschematic
 except ImportError:
-    print("❌ Missing dependency: mcschematic")
+    print("ERROR: Missing dependency: mcschematic")
     print("   Run: pip install mcschematic")
     sys.exit(1)
 
@@ -43,19 +62,19 @@ def load_blueprint(path: str) -> dict:
         with open(path, "r") as f:
             data = json.load(f)
     except FileNotFoundError:
-        print(f"❌ Blueprint file not found: {path}")
+        print(f"ERROR: Blueprint file not found: {path}")
         sys.exit(1)
     except json.JSONDecodeError as e:
-        print(f"❌ Invalid JSON in blueprint: {e}")
+        print(f"ERROR: Invalid JSON in blueprint: {e}")
         sys.exit(1)
 
     # Validate required fields
     if "blocks" not in data:
-        print("❌ Blueprint missing required 'blocks' array")
+        print("ERROR: Blueprint missing required 'blocks' array")
         sys.exit(1)
 
     if not isinstance(data["blocks"], list):
-        print("❌ 'blocks' must be an array")
+        print("ERROR: 'blocks' must be an array")
         sys.exit(1)
 
     return data
@@ -66,20 +85,20 @@ def validate_block(block: dict, index: int) -> bool:
     required = ["x", "y", "z", "block"]
     for field in required:
         if field not in block:
-            print(f"⚠️  Block #{index} missing field '{field}' — skipping")
+            print(f"WARNING: Block #{index} missing field '{field}' -- skipping")
             return False
 
     if not isinstance(block["x"], (int, float)):
-        print(f"⚠️  Block #{index}: 'x' must be a number — skipping")
+        print(f"WARNING: Block #{index}: 'x' must be a number -- skipping")
         return False
     if not isinstance(block["y"], (int, float)):
-        print(f"⚠️  Block #{index}: 'y' must be a number — skipping")
+        print(f"WARNING: Block #{index}: 'y' must be a number -- skipping")
         return False
     if not isinstance(block["z"], (int, float)):
-        print(f"⚠️  Block #{index}: 'z' must be a number — skipping")
+        print(f"WARNING: Block #{index}: 'z' must be a number -- skipping")
         return False
     if not isinstance(block["block"], str):
-        print(f"⚠️  Block #{index}: 'block' must be a string — skipping")
+        print(f"WARNING: Block #{index}: 'block' must be a string -- skipping")
         return False
 
     return True
@@ -100,7 +119,7 @@ def compute_bounds(blocks: list) -> dict:
     }
 
 
-def build_schematic(blueprint: dict, output_dir: str) -> str:
+def build_schematic(blueprint: dict, output_dir: str, config: dict) -> str:
     """Build the .schem file from a blueprint. Returns the output path."""
 
     name = blueprint.get("name", "build").replace(" ", "_")
@@ -111,10 +130,10 @@ def build_schematic(blueprint: dict, output_dir: str) -> str:
     # Resolve version
     version = VERSION_MAP.get(version_str)
     if version is None:
-        print(f"⚠️  Unknown version '{version_str}', defaulting to {DEFAULT_VERSION}")
+        print(f"WARNING: Unknown version '{version_str}', defaulting to {DEFAULT_VERSION}")
         version = VERSION_MAP[DEFAULT_VERSION]
 
-    print(f"\n🏗️  Building: {name}")
+    print(f"\nBuilding: {name}")
     if description:
         print(f"   {description}")
     print(f"   Version: {version_str}")
@@ -127,18 +146,18 @@ def build_schematic(blueprint: dict, output_dir: str) -> str:
             valid_blocks.append(block)
 
     if not valid_blocks:
-        print("❌ No valid blocks found in blueprint")
+        print("ERROR: No valid blocks found in blueprint")
         sys.exit(1)
 
     # Compute bounds
     bounds = compute_bounds(valid_blocks)
-    print(f"\n   Dimensions: {bounds['width']}W × {bounds['height']}H × {bounds['length']}L")
+    print(f"\n   Dimensions: {bounds['width']}W x {bounds['height']}H x {bounds['length']}L")
     print(f"   Total blocks: {len(valid_blocks)}")
 
     # Warn on large builds
     total_volume = bounds["width"] * bounds["height"] * bounds["length"]
     if total_volume > 1_000_000:
-        print(f"\n⚠️  Large build detected ({total_volume:,} block volume). This may take a while...")
+        print(f"\nWARNING: Large build detected ({total_volume:,} block volume). This may take a while...")
 
     # Build the schematic
     schem = mcschematic.MCSchematic()
@@ -151,7 +170,7 @@ def build_schematic(blueprint: dict, output_dir: str) -> str:
         x, y, z = int(block["x"]), int(block["y"]), int(block["z"])
         block_id = block["block"]
 
-        # Skip air explicitly — mcschematic treats unset blocks as air anyway
+        # Skip air explicitly -- mcschematic treats unset blocks as air anyway
         if block_id == "minecraft:air":
             skipped += 1
             continue
@@ -160,13 +179,13 @@ def build_schematic(blueprint: dict, output_dir: str) -> str:
             schem.setBlock((x, y, z), block_id)
             placed += 1
         except Exception as e:
-            print(f"⚠️  Failed to place {block_id} at ({x},{y},{z}): {e}")
+            print(f"WARNING: Failed to place {block_id} at ({x},{y},{z}): {e}")
             skipped += 1
 
         # Progress every 5000 blocks
         if placed % 5000 == 0 and placed > 0:
             elapsed = time.time() - start_time
-            print(f"   ⏳ Placed {placed:,} blocks... ({elapsed:.1f}s)")
+            print(f"   Placed {placed:,} blocks... ({elapsed:.1f}s)")
 
     elapsed = time.time() - start_time
 
@@ -175,16 +194,36 @@ def build_schematic(blueprint: dict, output_dir: str) -> str:
     schem.save(output_dir, name, version)
     output_path = os.path.join(output_dir, f"{name}.schem")
 
-    print(f"\n✅ Done in {elapsed:.2f}s")
+    print(f"\nDone in {elapsed:.2f}s")
     print(f"   Blocks placed: {placed:,}")
     if skipped:
         print(f"   Blocks skipped: {skipped}")
-    print(f"\n📦 Schematic saved: {output_path}")
-    print(f"\n💡 To use in Minecraft:")
-    print(f"   1. Copy '{name}.schem' to your WorldEdit schematics folder")
-    print(f"      (usually: .minecraft/config/worldedit/schematics/)")
-    print(f"   2. In-game: //schem load {name}")
-    print(f"   3. Stand where you want the origin, then: //paste")
+    print(f"\nSchematic saved: {output_path}")
+
+    # Auto-copy to WorldEdit schematics folder if configured
+    schematics_dir = config.get("schematics_dir")
+    if schematics_dir:
+        schematics_dir = os.path.expandvars(os.path.expanduser(schematics_dir))
+        try:
+            os.makedirs(schematics_dir, exist_ok=True)
+            dest = os.path.join(schematics_dir, f"{name}.schem")
+            shutil.copy2(output_path, dest)
+            print(f"Auto-copied to WorldEdit: {dest}")
+            print(f"\nIn-game:")
+            print(f"   //schem load {name}")
+            print(f"   //paste -a")
+        except Exception as e:
+            print(f"WARNING: Could not auto-copy to schematics folder: {e}")
+            print(f"   Manually copy '{name}.schem' to: {schematics_dir}")
+    else:
+        print(f"\nTo use in Minecraft:")
+        print(f"   1. Copy '{name}.schem' to your WorldEdit schematics folder")
+        print(f"      - Singleplayer (Fabric/Forge): .minecraft/config/worldedit/schematics/")
+        print(f"      - Multiplayer (Spigot/Paper):  server-root/plugins/WorldEdit/schematics/")
+        print(f"      - Prism/other launcher:        <instance>/minecraft/config/worldedit/schematics/")
+        print(f"      Tip: set schematics_dir in config.json to auto-copy after every build")
+        print(f"   2. In-game: //schem load {name}")
+        print(f"   3. //paste -a")
 
     return output_path
 
@@ -195,9 +234,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python3 build.py castle.json
-  python3 build.py tower.json --output-dir ~/schematics
-  python3 build.py village.json --output-dir .
+  python build.py castle.json
+  python build.py tower.json --output-dir ~/schematics
+  python build.py village.json --output-dir .
 
 Blueprint JSON format:
   {
@@ -221,11 +260,12 @@ Blueprint JSON format:
     args = parser.parse_args()
 
     print("=" * 50)
-    print("  Minecraft Map Builder — Blueprint Executor")
+    print("  Minecraft Map Builder -- Blueprint Executor")
     print("=" * 50)
 
+    config = load_config()
     blueprint = load_blueprint(args.blueprint)
-    build_schematic(blueprint, args.output_dir)
+    build_schematic(blueprint, args.output_dir, config)
 
 
 if __name__ == "__main__":
