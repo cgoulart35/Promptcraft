@@ -4,7 +4,7 @@
 
 A Claude Code plugin that turns natural language into real Minecraft worlds. Tell Claude what you want to build — a medieval castle, a jungle temple, an underwater city — and get a `.schem` file pasted directly into your WorldEdit schematics folder.
 
-> Built for [Claude Code](https://claude.ai/code) · Outputs WorldEdit-compatible `.schem` files · Java Edition 1.21.1
+> Built for [Claude Code](https://claude.ai/code) · Outputs WorldEdit-compatible `.schem` files · Java Edition
 
 ---
 
@@ -124,7 +124,10 @@ python build.py output/watchtower.json   # outputs output/watchtower.schem
 ```
 Promptcraft/
 ├── .claude-plugin/
+│   ├── marketplace.json        ← Marketplace metadata
 │   └── plugin.json             ← Plugin manifest
+├── .github/
+│   └── FUNDING.yml             ← Sponsorship links
 ├── skills/
 │   ├── build/SKILL.md          ← /promptcraft:build <description>
 │   └── setup/SKILL.md          ← /promptcraft:setup

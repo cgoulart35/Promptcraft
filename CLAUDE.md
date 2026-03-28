@@ -77,27 +77,53 @@ minecraft:oak_log
 minecraft:oak_planks
 minecraft:oak_stairs
 minecraft:oak_slab
+minecraft:stripped_oak_log
 minecraft:spruce_log
 minecraft:spruce_planks
 minecraft:spruce_stairs
 minecraft:spruce_slab
+minecraft:stripped_spruce_log
 minecraft:birch_log
 minecraft:birch_planks
+minecraft:birch_stairs
+minecraft:birch_slab
+minecraft:stripped_birch_log
 minecraft:dark_oak_log
 minecraft:dark_oak_planks
+minecraft:dark_oak_stairs
+minecraft:dark_oak_slab
+minecraft:stripped_dark_oak_log
 minecraft:jungle_log
 minecraft:jungle_planks
+minecraft:jungle_stairs
+minecraft:jungle_slab
+minecraft:stripped_jungle_log
 minecraft:acacia_log
 minecraft:acacia_planks
+minecraft:acacia_stairs
+minecraft:acacia_slab
+minecraft:stripped_acacia_log
 minecraft:mangrove_log
 minecraft:mangrove_planks
+minecraft:mangrove_stairs
+minecraft:mangrove_slab
+minecraft:stripped_mangrove_log
 minecraft:cherry_log
 minecraft:cherry_planks
+minecraft:cherry_stairs
+minecraft:cherry_slab
+minecraft:stripped_cherry_log
 ```
 
 ### Bricks & Stone Work
 ```
-minecraft:brick
+minecraft:smooth_stone
+minecraft:smooth_stone_slab
+minecraft:stone_stairs
+minecraft:stone_slab
+minecraft:stone_brick_stairs
+minecraft:stone_brick_slab
+minecraft:bricks
 minecraft:brick_stairs
 minecraft:brick_slab
 minecraft:nether_brick
@@ -119,6 +145,48 @@ minecraft:quartz_block
 minecraft:smooth_quartz
 minecraft:quartz_pillar
 minecraft:purpur_block
+```
+
+### Concrete
+```
+minecraft:white_concrete
+minecraft:orange_concrete
+minecraft:magenta_concrete
+minecraft:light_blue_concrete
+minecraft:yellow_concrete
+minecraft:lime_concrete
+minecraft:pink_concrete
+minecraft:gray_concrete
+minecraft:light_gray_concrete
+minecraft:cyan_concrete
+minecraft:purple_concrete
+minecraft:blue_concrete
+minecraft:brown_concrete
+minecraft:green_concrete
+minecraft:red_concrete
+minecraft:black_concrete
+```
+
+### Terracotta
+```
+minecraft:terracotta
+minecraft:white_terracotta
+minecraft:orange_terracotta
+minecraft:magenta_terracotta
+minecraft:light_blue_terracotta
+minecraft:yellow_terracotta
+minecraft:lime_terracotta
+minecraft:pink_terracotta
+minecraft:gray_terracotta
+minecraft:light_gray_terracotta
+minecraft:cyan_terracotta
+minecraft:purple_terracotta
+minecraft:blue_terracotta
+minecraft:brown_terracotta
+minecraft:green_terracotta
+minecraft:red_terracotta
+minecraft:black_terracotta
+minecraft:glazed_terracotta
 ```
 
 ### Glass & Light
@@ -160,7 +228,7 @@ minecraft:cherry_leaves
 minecraft:azalea_leaves
 minecraft:flowering_azalea_leaves
 minecraft:mangrove_leaves
-minecraft:grass
+minecraft:short_grass
 minecraft:tall_grass
 minecraft:fern
 minecraft:large_fern
@@ -190,7 +258,6 @@ minecraft:lily_pad
 minecraft:seagrass
 minecraft:kelp
 minecraft:sea_pickle
-minecraft:coral_block
 minecraft:brain_coral_block
 minecraft:tube_coral_block
 minecraft:fire_coral_block
@@ -281,7 +348,7 @@ minecraft:brewing_stand
 minecraft:cauldron
 minecraft:barrel
 minecraft:composter
-minecraft:bed (use color variants: minecraft:red_bed etc.)
+minecraft:red_bed (also: white_bed, blue_bed, etc.)
 minecraft:lectern
 minecraft:grindstone
 minecraft:stonecutter
@@ -293,10 +360,7 @@ minecraft:smithing_table
 ### Decorative
 ```
 minecraft:flower_pot
-minecraft:painting
-minecraft:item_frame
-minecraft:armor_stand
-minecraft:banner (with color prefix: minecraft:red_banner)
+minecraft:red_banner (also: white_banner, blue_banner, etc.)
 minecraft:campfire
 minecraft:soul_campfire
 minecraft:bell
@@ -344,13 +408,13 @@ minecraft:oak_log[axis=z]
 minecraft:glass_pane[east=true,west=true]
 minecraft:oak_door[facing=north,half=lower,hinge=left]
 minecraft:oak_door[facing=north,half=upper,hinge=left]
-minecraft:torch[facing=north]   ← wall torch
-minecraft:torch   ← floor torch
+minecraft:wall_torch[facing=north]   ← wall torch
+minecraft:torch   ← floor torch (no facing property)
 minecraft:chest[facing=north]
 minecraft:furnace[facing=south,lit=false]
-minecraft:slab[type=bottom]
-minecraft:slab[type=top]
-minecraft:slab[type=double]
+minecraft:oak_slab[type=bottom]
+minecraft:oak_slab[type=top]
+minecraft:oak_slab[type=double]
 ```
 
 **Stair facings**: `north`, `south`, `east`, `west`

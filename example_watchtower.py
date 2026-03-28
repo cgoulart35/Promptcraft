@@ -107,9 +107,9 @@ torch_positions = [
 for tx, ty, tz in torch_positions:
     add(tx, ty, tz, "minecraft:torch")
 
-# ─── Ladder on north wall interior (x=1, z=1 to 5) ────────────
+# ─── Ladder column at (x=1, z=1), climbing full tower height ──
 for ly in range(1, H - 3):
-    add(1, ly, 1, "minecraft:ladder[facing=south]")
+    add(1, ly, 1, "minecraft:ladder[facing=north]")
 
 # ─── Output blueprint ──────────────────────────────────────────
 blueprint = {
