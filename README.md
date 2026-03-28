@@ -36,18 +36,18 @@ No GUI. No web app. Just Claude Code, your terminal, and Minecraft.
 
 ## Installation
 
-### 1. Add the Promptcraft plugin source
+### 1. Add the Promptcraft marketplace
 
-In Claude Code, add this repository as a plugin source:
+In Claude Code, add this repository as a marketplace:
 
 ```
-/plugin source add https://github.com/cgoulart35/Promptcraft
+/plugin marketplace add cgoulart35/Promptcraft
 ```
 
 ### 2. Install the plugin
 
 ```
-/plugin install promptcraft
+/plugin install promptcraft@promptcraft
 ```
 
 ### 3. Run first-time setup

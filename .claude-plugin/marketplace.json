@@ -1,0 +1,20 @@
+{
+  "name": "promptcraft",
+  "owner": {
+    "name": "cgoulart35",
+    "email": "promptcraft.development@gmail.com",
+    "url": "https://github.com/cgoulart35"
+  },
+  "metadata": {
+    "description": "Generate real Minecraft structures from natural language",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "promptcraft",
+      "source": "./",
+      "description": "Generate real Minecraft structures from natural language. Describe what you want -- a medieval castle, jungle temple, nether fortress -- and get a .schem file ready to paste into Minecraft via WorldEdit.",
+      "version": "1.0.0"
+    }
+  ]
+}

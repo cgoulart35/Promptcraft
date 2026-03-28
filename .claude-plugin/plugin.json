@@ -1,7 +1,7 @@
 {
   "name": "promptcraft",
   "version": "1.0.0",
-  "description": "Generate real Minecraft structures from natural language. Describe what you want — a medieval castle, jungle temple, nether fortress — and get a .schem file ready to paste into Minecraft via WorldEdit.",
+  "description": "Generate real Minecraft structures from natural language. Describe what you want -- a medieval castle, jungle temple, nether fortress -- and get a .schem file ready to paste into Minecraft via WorldEdit.",
   "author": {
     "name": "cgoulart35",
     "url": "https://github.com/cgoulart35"
@@ -9,15 +9,5 @@
   "homepage": "https://promptcraft.dev",
   "repository": "https://github.com/cgoulart35/Promptcraft",
   "license": "UNLICENSED",
-  "keywords": ["minecraft", "worldedit", "schematic", "world-generation", "building", "creative"],
-  "skills": [
-    {
-      "name": "setup",
-      "path": "skills/setup/SKILL.md"
-    },
-    {
-      "name": "build",
-      "path": "skills/build/SKILL.md"
-    }
-  ]
+  "keywords": ["minecraft", "worldedit", "schematic", "world-generation", "building", "creative"]
 }
