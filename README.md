@@ -166,12 +166,13 @@ Or just describe your own — Claude will figure out the materials.
 
 ## Roadmap
 
-- [ ] Terrain generation (hills, rivers, cliffs under structures)
-- [ ] Biome-aware builds (auto-match surrounding biome)
-- [ ] Interior furnishing (chests, crafting tables, beds placed contextually)
-- [ ] Village generation (multiple buildings + connecting paths)
-- [ ] Dungeon generation with loot tables
-- [ ] Bedrock Edition support
+- [ ] Research terrain generation (hills, rivers, cliffs under structures)
+- [ ] Research biome-aware builds (auto-match surrounding biome)
+- [ ] Research interior furnishing (chests, crafting tables, beds placed contextually)
+- [ ] Research village generation (multiple buildings + connecting paths)
+- [ ] Research dungeon generation with loot tables
+- [ ] Research Gemini CLI support
+- [ ] Research bedrock Edition support
 
 ---
 
