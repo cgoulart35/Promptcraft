@@ -25,9 +25,9 @@ No GUI. No web app. Just Claude Code, your terminal, and Minecraft.
 ---
 
 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-  <img src="https://github.com/user-attachments/assets/e2be3fd6-4c4e-4eb3-9a22-f8824b15b4db" style="width: 33%;" />
-  <img src="https://github.com/user-attachments/assets/7a368419-86e1-4853-9061-13a7bce62540" style="width: 33%;" />
-  <img src="https://github.com/user-attachments/assets/66cdcf01-b5a5-42bf-9d7d-15dd2e8d3b9b" style="width: 33%;" />
+  <img src="https://github.com/user-attachments/assets/e2be3fd6-4c4e-4eb3-9a22-f8824b15b4db" style="width: 32%;" />
+  <img src="https://github.com/user-attachments/assets/7a368419-86e1-4853-9061-13a7bce62540" style="width: 32%;" />
+  <img src="https://github.com/user-attachments/assets/66cdcf01-b5a5-42bf-9d7d-15dd2e8d3b9b" style="width: 32%;" />
 </div>
 
 ---
