@@ -26,7 +26,7 @@ Save your blueprint as a `.json` file, then run `python build.py yourfile.json`.
   "blocks": [
     { "x": 0, "y": 0, "z": 0, "block": "minecraft:stone" },
     { "x": 1, "y": 0, "z": 0, "block": "minecraft:oak_planks" },
-    { "x": 0, "y": 1, "z": 0, "block": "minecraft:glass_pane[facing=north]" }
+    { "x": 0, "y": 1, "z": 0, "block": "minecraft:glass_pane[north=true,south=true]" }
   ]
 }
 ```
@@ -67,7 +67,17 @@ minecraft:mud
 minecraft:sand
 minecraft:red_sand
 minecraft:sandstone
+minecraft:smooth_sandstone
+minecraft:chiseled_sandstone
+minecraft:sandstone_stairs
+minecraft:sandstone_slab
+minecraft:sandstone_wall
 minecraft:red_sandstone
+minecraft:smooth_red_sandstone
+minecraft:chiseled_red_sandstone
+minecraft:red_sandstone_stairs
+minecraft:red_sandstone_slab
+minecraft:red_sandstone_wall
 minecraft:bedrock
 ```
 
@@ -126,11 +136,23 @@ minecraft:stone_brick_slab
 minecraft:bricks
 minecraft:brick_stairs
 minecraft:brick_slab
-minecraft:nether_brick
+minecraft:nether_bricks
+minecraft:nether_brick_stairs
+minecraft:nether_brick_slab
+minecraft:nether_brick_wall
 minecraft:red_nether_bricks
+minecraft:red_nether_brick_stairs
+minecraft:red_nether_brick_slab
+minecraft:red_nether_brick_wall
 minecraft:blackstone
+minecraft:blackstone_stairs
+minecraft:blackstone_slab
+minecraft:blackstone_wall
 minecraft:polished_blackstone
 minecraft:polished_blackstone_bricks
+minecraft:polished_blackstone_stairs
+minecraft:polished_blackstone_slab
+minecraft:polished_blackstone_wall
 minecraft:basalt
 minecraft:smooth_basalt
 minecraft:tuff
@@ -186,7 +208,7 @@ minecraft:brown_terracotta
 minecraft:green_terracotta
 minecraft:red_terracotta
 minecraft:black_terracotta
-minecraft:glazed_terracotta
+minecraft:white_glazed_terracotta (also: orange_, magenta_, light_blue_, etc.)
 ```
 
 ### Glass & Light
@@ -464,7 +486,7 @@ When the user asks for a style, use these material combinations:
 
 ### Medieval / Fantasy
 Walls: `stone_bricks`, `mossy_stone_bricks`, `cobblestone`
-Floor: `oak_planks`, `stone_slabs`
+Floor: `oak_planks`, `stone_slab`
 Roof: `dark_oak_stairs`, `dark_oak_planks`
 Accent: `mossy_cobblestone`, `iron_bars`, `oak_fence`
 Light: `lantern`, `torch`
@@ -484,9 +506,9 @@ Accent: `iron_bars`, `end_rod`, `glass_pane`
 Light: `sea_lantern`, `glowstone`
 
 ### Dark / Nether
-Walls: `blackstone`, `polished_blackstone_bricks`, `nether_brick`
+Walls: `blackstone`, `polished_blackstone_bricks`, `nether_bricks`
 Floor: `basalt`, `soul_sand`
-Roof: `nether_brick`, `blackstone_slab`
+Roof: `nether_bricks`, `blackstone_slab`
 Accent: `magma_block`, `crying_obsidian`, `chain`
 Light: `shroomlight`, `soul_campfire`, `glowstone`
 
