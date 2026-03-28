@@ -2,7 +2,7 @@
 
 **Describe it. Build it.**
 
-A Claude Code plugin that thinks with you,turning natural language conversation into real Minecraft worlds. Tell Claude what you want to build — a medieval castle, a jungle temple, an underwater city — and get a `.schem` file pasted directly into your WorldEdit schematics folder. Still not exactly what you were looking for? Ask Promptcraft to fix it.
+A Claude Code plugin that thinks with you, turning natural language conversation into real Minecraft worlds. Tell Claude what you want to build — a medieval castle, a jungle temple, an underwater city — and get a `.schem` file pasted directly into your WorldEdit schematics folder. Still not exactly what you were looking for? Ask Promptcraft to fix it.
 
 > Built for [Claude Code](https://claude.ai/code) · Outputs WorldEdit-compatible `.schem` files · Java Edition
 
