@@ -71,6 +71,49 @@ def hollow_box(x1, y1, z1, x2, y2, z2, block):
     for y in range(y1, y2 + 1):
         hollow_rect(x1, y, z1, x2, z2, block)
 
+def fill_circle(cx, y, cz, radius, block):
+    """Fill a solid circle at height y."""
+    for x in range(cx - radius, cx + radius + 1):
+        for z in range(cz - radius, cz + radius + 1):
+            if (x - cx) ** 2 + (z - cz) ** 2 <= radius ** 2:
+                blocks.append({"x": x, "y": y, "z": z, "block": block})
+
+def hollow_circle(cx, y, cz, radius, block):
+    """Place only the perimeter of a circle at height y."""
+    if radius == 0:
+        blocks.append({"x": cx, "y": y, "z": cz, "block": block})
+        return
+    for x in range(cx - radius, cx + radius + 1):
+        for z in range(cz - radius, cz + radius + 1):
+            dist_sq = (x - cx) ** 2 + (z - cz) ** 2
+            if (radius - 1) ** 2 < dist_sq <= radius ** 2:
+                blocks.append({"x": x, "y": y, "z": z, "block": block})
+
+def pitched_roof(x1, z1, x2, z2, y_base, block_stair, block_cap):
+    """Build a gable roof with ridge running east-west (X axis).
+    North slope uses facing=north stairs, south slope uses facing=south.
+    Ridge is capped with full blocks."""
+    width_z = z2 - z1 + 1
+    half = width_z // 2
+    for layer in range(half):
+        y = y_base + layer
+        # North slope
+        for x in range(x1, x2 + 1):
+            blocks.append({"x": x, "y": y, "z": z1 + layer,
+                           "block": f"{block_stair}[facing=north,half=bottom]"})
+        # South slope
+        for x in range(x1, x2 + 1):
+            blocks.append({"x": x, "y": y, "z": z2 - layer,
+                           "block": f"{block_stair}[facing=south,half=bottom]"})
+    # Ridge cap — fill the center to close the peak
+    if width_z % 2 == 1:
+        # Odd width: single center row of full blocks
+        ridge_z = z1 + half
+        for x in range(x1, x2 + 1):
+            blocks.append({"x": x, "y": y_base + half, "z": ridge_z, "block": block_cap})
+    # Even width: the two innermost stair rows face each other with high sides meeting —
+    # they already form a complete peak, no cap block needed.
+
 # ... build logic here ...
 
 blueprint = {
@@ -134,11 +177,27 @@ Tell the user:
 - **Entrances** — doors need frames, arches, or steps.
 - **Lived-in details** — flower pots, torches, barrels, crafting tables.
 
+## Pre-build checklist
+
+Before generating the final blueprint, verify each item:
+
+- [ ] **Roof has no gaps** — ridge line filled with full blocks or top slabs, stair orientations are correct
+- [ ] **Every torch has support** — floor torch on solid block below, wall_torch facing away from its wall
+- [ ] **Every ladder is flush** — facing points toward a solid wall block
+- [ ] **Doors have both halves** — lower + upper with matching facing/hinge
+- [ ] **Beds have both parts** — head + foot with correct facing
+- [ ] **Windows look right** — glass panes have connection states set (`east=true,west=true` etc.)
+- [ ] **Leaves have `persistent=true`** — without it, leaves decay and vanish in-game within minutes
+- [ ] **No block conflicts** — ladder holes cut through floors, torches not overwritten by later blocks
+- [ ] **Placement order** — foundation → walls → roof → openings → doors → furniture → lighting → decorations
+- [ ] **At least 2-3 materials** — no single-material walls; mix in accent blocks
+- [ ] **Lighting coverage** — no large dark interior areas; place torches/lanterns every 6-8 blocks
+
 ---
 
 ## Coordinate reminder
 
-- Origin `(0,0,0)` = southwest bottom corner
+- Origin `(0,0,0)` = northwest bottom corner
 - X = East (+), Y = Up (+), Z = South (+)
 - Y=0 is ground level — build upward from there
 - Always `//paste -a` to strip air and blend into terrain

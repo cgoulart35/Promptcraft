@@ -172,7 +172,7 @@ Or just describe your own — Claude will figure out the materials.
 - [ ] Research village generation (multiple buildings + connecting paths)
 - [ ] Research dungeon generation with loot tables
 - [ ] Research Gemini CLI support
-- [ ] Research bedrock Edition support
+- [ ] Research Bedrock Edition support
 
 ---
 
