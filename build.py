@@ -2,6 +2,7 @@
 """
 Minecraft Map Builder -- Blueprint Executor
 ==========================================
+Version: 1.0.0
 Converts a Claude-generated JSON blueprint into a real Minecraft .schem file
 importable via WorldEdit (Java Edition).
 
@@ -24,6 +25,8 @@ import re
 import shutil
 import sys
 import time
+
+__version__ = "1.0.0"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(SCRIPT_DIR, "config.json")
@@ -86,7 +89,8 @@ def load_blueprint(path: str) -> dict:
         sys.exit(1)
 
     if "name" not in data or not isinstance(data.get("name"), str):
-        print("WARNING: Blueprint missing or invalid 'name' field -- will default to 'build'")
+        print("WARNING: Blueprint missing or invalid 'name' field -- defaulting to 'build'")
+        data["name"] = "build"
     version_str = data.get("version", DEFAULT_VERSION)
     if version_str not in VERSION_MAP:
         print(f"WARNING: Unknown version '{version_str}' in blueprint -- will default to {DEFAULT_VERSION}")
@@ -154,7 +158,9 @@ def rebuild_block_id(base: str, props: dict) -> str:
     return f"{base}[{state}]"
 
 
-# Blocks that don't count as solid for support/connectivity purposes
+# Blocks that don't count as solid for support/connectivity purposes.
+# NOTE: Add new non-solid block IDs here when supporting a new Minecraft version —
+# e.g., new plants, decorations, or non-cube blocks introduced since JE 1.21.1.
 _TRANSPARENT_BLOCKS = {
     "minecraft:air", "minecraft:torch", "minecraft:wall_torch",
     "minecraft:soul_torch", "minecraft:soul_wall_torch",
@@ -177,7 +183,117 @@ _TRANSPARENT_BLOCKS = {
     # Crops
     "minecraft:wheat", "minecraft:potatoes", "minecraft:carrots",
     "minecraft:beetroots", "minecraft:nether_wart",
+    # Flowers
+    "minecraft:poppy", "minecraft:dandelion", "minecraft:blue_orchid",
+    "minecraft:allium", "minecraft:azure_bluet", "minecraft:red_tulip",
+    "minecraft:orange_tulip", "minecraft:white_tulip", "minecraft:pink_tulip",
+    "minecraft:oxeye_daisy", "minecraft:cornflower", "minecraft:lily_of_the_valley",
+    "minecraft:wither_rose", "minecraft:torchflower",
+    "minecraft:rose_bush", "minecraft:lilac", "minecraft:peony",
+    "minecraft:sunflower", "minecraft:large_fern",
+    "minecraft:lily_pad",
+    # Banners
+    "minecraft:white_banner", "minecraft:orange_banner", "minecraft:magenta_banner",
+    "minecraft:light_blue_banner", "minecraft:yellow_banner", "minecraft:lime_banner",
+    "minecraft:pink_banner", "minecraft:gray_banner", "minecraft:light_gray_banner",
+    "minecraft:cyan_banner", "minecraft:purple_banner", "minecraft:blue_banner",
+    "minecraft:brown_banner", "minecraft:green_banner", "minecraft:red_banner",
+    "minecraft:black_banner",
+    "minecraft:white_wall_banner", "minecraft:orange_wall_banner", "minecraft:magenta_wall_banner",
+    "minecraft:light_blue_wall_banner", "minecraft:yellow_wall_banner", "minecraft:lime_wall_banner",
+    "minecraft:pink_wall_banner", "minecraft:gray_wall_banner", "minecraft:light_gray_wall_banner",
+    "minecraft:cyan_wall_banner", "minecraft:purple_wall_banner", "minecraft:blue_wall_banner",
+    "minecraft:brown_wall_banner", "minecraft:green_wall_banner", "minecraft:red_wall_banner",
+    "minecraft:black_wall_banner",
+    # Carpets
+    "minecraft:white_carpet", "minecraft:orange_carpet", "minecraft:magenta_carpet",
+    "minecraft:light_blue_carpet", "minecraft:yellow_carpet", "minecraft:lime_carpet",
+    "minecraft:pink_carpet", "minecraft:gray_carpet", "minecraft:light_gray_carpet",
+    "minecraft:cyan_carpet", "minecraft:purple_carpet", "minecraft:blue_carpet",
+    "minecraft:brown_carpet", "minecraft:green_carpet", "minecraft:red_carpet",
+    "minecraft:black_carpet",
+    # Candles
+    "minecraft:candle", "minecraft:white_candle", "minecraft:orange_candle",
+    "minecraft:magenta_candle", "minecraft:light_blue_candle", "minecraft:yellow_candle",
+    "minecraft:lime_candle", "minecraft:pink_candle", "minecraft:gray_candle",
+    "minecraft:light_gray_candle", "minecraft:cyan_candle", "minecraft:purple_candle",
+    "minecraft:blue_candle", "minecraft:brown_candle", "minecraft:green_candle",
+    "minecraft:red_candle", "minecraft:black_candle",
+    # Thin/non-solid natural blocks (panes should not connect to these)
+    "minecraft:bamboo", "minecraft:sugar_cane", "minecraft:scaffolding",
+    "minecraft:cobweb",
+    "minecraft:seagrass", "minecraft:tall_seagrass",
+    "minecraft:kelp", "minecraft:kelp_plant",
+    "minecraft:sea_pickle",
+    "minecraft:glow_lichen", "minecraft:spore_blossom", "minecraft:hanging_roots",
+    # Dripleaf / dripstone
+    "minecraft:small_dripleaf", "minecraft:big_dripleaf",
+    "minecraft:pointed_dripstone",
+    # Chorus
+    "minecraft:chorus_plant", "minecraft:chorus_flower",
+    # Cactus / bamboo variants
+    "minecraft:cactus", "minecraft:bamboo_sapling",
+    # Signs (wall and floor, all wood types)
+    "minecraft:oak_sign", "minecraft:oak_wall_sign",
+    "minecraft:spruce_sign", "minecraft:spruce_wall_sign",
+    "minecraft:birch_sign", "minecraft:birch_wall_sign",
+    "minecraft:jungle_sign", "minecraft:jungle_wall_sign",
+    "minecraft:acacia_sign", "minecraft:acacia_wall_sign",
+    "minecraft:dark_oak_sign", "minecraft:dark_oak_wall_sign",
+    "minecraft:mangrove_sign", "minecraft:mangrove_wall_sign",
+    "minecraft:cherry_sign", "minecraft:cherry_wall_sign",
+    "minecraft:bamboo_sign", "minecraft:bamboo_wall_sign",
+    "minecraft:crimson_sign", "minecraft:crimson_wall_sign",
+    "minecraft:warped_sign", "minecraft:warped_wall_sign",
+    # Pressure plates (all variants)
+    "minecraft:spruce_pressure_plate", "minecraft:birch_pressure_plate",
+    "minecraft:jungle_pressure_plate", "minecraft:acacia_pressure_plate",
+    "minecraft:dark_oak_pressure_plate", "minecraft:mangrove_pressure_plate",
+    "minecraft:cherry_pressure_plate", "minecraft:bamboo_pressure_plate",
+    "minecraft:crimson_pressure_plate", "minecraft:warped_pressure_plate",
+    "minecraft:light_weighted_pressure_plate", "minecraft:heavy_weighted_pressure_plate",
+    "minecraft:polished_blackstone_pressure_plate",
+    # Buttons (all variants)
+    "minecraft:spruce_button", "minecraft:birch_button",
+    "minecraft:jungle_button", "minecraft:acacia_button",
+    "minecraft:dark_oak_button", "minecraft:mangrove_button",
+    "minecraft:cherry_button", "minecraft:bamboo_button",
+    "minecraft:crimson_button", "minecraft:warped_button",
+    "minecraft:polished_blackstone_button",
+    # Skulls and heads (floor and wall variants)
+    "minecraft:skeleton_skull", "minecraft:skeleton_wall_skull",
+    "minecraft:wither_skeleton_skull", "minecraft:wither_skeleton_wall_skull",
+    "minecraft:zombie_head", "minecraft:zombie_wall_head",
+    "minecraft:player_head", "minecraft:player_wall_head",
+    "minecraft:creeper_head", "minecraft:creeper_wall_head",
+    "minecraft:dragon_head", "minecraft:dragon_wall_head",
+    "minecraft:piglin_head", "minecraft:piglin_wall_head",
+    # Saplings
+    "minecraft:oak_sapling", "minecraft:spruce_sapling", "minecraft:birch_sapling",
+    "minecraft:jungle_sapling", "minecraft:acacia_sapling", "minecraft:dark_oak_sapling",
+    "minecraft:cherry_sapling", "minecraft:mangrove_propagule",
+    # Mushrooms
+    "minecraft:brown_mushroom", "minecraft:red_mushroom",
+    # Nether vegetation
+    "minecraft:crimson_roots", "minecraft:warped_roots",
+    "minecraft:crimson_fungus", "minecraft:warped_fungus",
+    "minecraft:nether_sprouts",
+    # Non-solid functional blocks (bell excluded — has solid top face, can support blocks)
+    "minecraft:brewing_stand", "minecraft:grindstone",
+    "minecraft:stonecutter", "minecraft:lectern", "minecraft:composter",
+    "minecraft:cauldron",
+    # Amethyst buds and clusters
+    "minecraft:small_amethyst_bud", "minecraft:medium_amethyst_bud",
+    "minecraft:large_amethyst_bud", "minecraft:amethyst_cluster",
+    # Sculk
+    "minecraft:sculk_vein",
+    # Additional crops
+    "minecraft:sweet_berry_bush", "minecraft:cave_vines", "minecraft:cave_vines_plant",
+    "minecraft:melon_stem", "minecraft:pumpkin_stem",
+    "minecraft:attached_melon_stem", "minecraft:attached_pumpkin_stem",
+    "minecraft:cocoa", "minecraft:torchflower_crop", "minecraft:pitcher_crop",
     # Misc non-solid
+    "minecraft:lever", "minecraft:fire", "minecraft:soul_fire",
     "minecraft:end_rod",
 }
 
@@ -205,8 +321,10 @@ def auto_fix_blocks(blocks: list) -> tuple:
 
     Returns (fixed_blocks, list_of_fix_messages).
     """
-    # Build position lookup for pane connectivity — solid/opaque blocks only.
-    # Transparent and non-solid blocks (torches, rails, etc.) must not cause panes to connect.
+    # Build position lookup for pane connectivity.
+    # Includes solid blocks AND connectable blocks (panes, bars) so that adjacent panes/bars
+    # link to each other — matching real Minecraft behavior. Excludes air, torches, ladders,
+    # and other non-solid transparent blocks that should not trigger connections.
     positions = set()
     for b in blocks:
         base, _ = parse_block_state(b["block"])
@@ -267,7 +385,7 @@ def validate_placement(blocks: list) -> list:
         return (
             bid is not None
             and bid not in _TRANSPARENT_BLOCKS
-            and bid not in _STAINED_GLASS_PANES
+            and bid not in _ALL_CONNECTABLE
         )
 
     warnings = []
@@ -294,7 +412,9 @@ def validate_placement(blocks: list) -> list:
     doors_unpaired = 0
     doors_no_floor = 0
     beds_unpaired = 0
-    panes_no_states = 0
+    flower_pots_unsupported = 0
+    lanterns_unsupported = 0
+    campfires_unsupported = 0
 
     door_halves = {}  # (x, y_lower, z, base, facing, hinge) -> {y_lower, y_upper}
     bed_parts = {}    # (base, facing) -> {"heads": [(x,y,z)...], "feet": [(x,y,z)...]}
@@ -353,10 +473,25 @@ def validate_placement(blocks: list) -> list:
             elif part == "foot":
                 bed_parts[key].setdefault("feet", []).append((x, y, z))
 
-        # Glass panes / iron bars without connection states render as a cross shape
-        if base in _ALL_CONNECTABLE:
-            if not all(d in props for d in _CONNECTION_DIRS):
-                panes_no_states += 1
+        # Flower pots need a solid block below
+        if base == "minecraft:flower_pot":
+            if not is_solid(x, y - 1, z):
+                flower_pots_unsupported += 1
+
+        # Lanterns: sitting lanterns need solid below; hanging lanterns need solid above
+        if base in ("minecraft:lantern", "minecraft:soul_lantern"):
+            hanging = props.get("hanging", "false") == "true"
+            if hanging:
+                if not is_solid(x, y + 1, z):
+                    lanterns_unsupported += 1
+            else:
+                if not is_solid(x, y - 1, z):
+                    lanterns_unsupported += 1
+
+        # Campfires need a solid block below
+        if base in ("minecraft:campfire", "minecraft:soul_campfire"):
+            if not is_solid(x, y - 1, z):
+                campfires_unsupported += 1
 
     # Check door pairing and floor support
     for key, halves in door_halves.items():
@@ -379,16 +514,23 @@ def validate_placement(blocks: list) -> list:
     }
     for (base, facing), parts in bed_parts.items():
         heads = parts.get("heads", [])
-        feet = set(parts.get("feet", []))
+        feet = parts.get("feet", [])
+        heads_set = set(heads)
+        feet_set = set(feet)
         offset = _bed_foot_offset.get(facing)
         if offset is None:
-            # Unknown facing value — flag all heads as unpaired
-            beds_unpaired += len(heads)
+            # Unknown facing value — flag all halves as unpaired
+            beds_unpaired += len(heads) + len(feet)
             continue
         dx, dy, dz = offset
         for hx, hy, hz in heads:
             expected_foot = (hx + dx, hy + dy, hz + dz)
-            if expected_foot not in feet:
+            if expected_foot not in feet_set:
+                beds_unpaired += 1
+        # Also detect orphaned feet (foot placed without a matching head)
+        for fx, fy, fz in feet:
+            expected_head = (fx - dx, fy - dy, fz - dz)
+            if expected_head not in heads_set:
                 beds_unpaired += 1
 
     if torches_unsupported:
@@ -401,8 +543,12 @@ def validate_placement(blocks: list) -> list:
         warnings.append(f"{doors_no_floor} door(s) with no solid block below (lower half unsupported)")
     if beds_unpaired:
         warnings.append(f"{beds_unpaired} bed(s) missing their head or foot part")
-    if panes_no_states:
-        warnings.append(f"{panes_no_states} glass pane/iron bar block(s) missing connection states — will render as a cross shape")
+    if flower_pots_unsupported:
+        warnings.append(f"{flower_pots_unsupported} flower pot(s) without a solid block below (will drop as items in-game)")
+    if lanterns_unsupported:
+        warnings.append(f"{lanterns_unsupported} lantern(s) without a support block (will drop as items in-game)")
+    if campfires_unsupported:
+        warnings.append(f"{campfires_unsupported} campfire(s) without a solid block below (will drop as items in-game)")
 
     return warnings
 
@@ -437,7 +583,7 @@ def build_schematic(blueprint: dict, output_dir: str, config: dict) -> str:
     """Build the .schem file from a blueprint. Returns the output path."""
 
     name = re.sub(r'[<>:"/\\|?*\s]', "_", str(blueprint.get("name", "build")))
-    name = re.sub(r"_+", "_", name).strip("_")
+    name = re.sub(r"_+", "_", name).strip("_").strip(".")
     if not name:
         name = "build"
     if len(name) > 200:
@@ -464,13 +610,21 @@ def build_schematic(blueprint: dict, output_dir: str, config: dict) -> str:
 
     # Validate blocks
     valid_blocks = []
+    float_coords = 0
     for i, block in enumerate(raw_blocks):
         if validate_block(block, i):
             valid_blocks.append(block)
+            if (block["x"] != round(block["x"])
+                    or block["y"] != round(block["y"])
+                    or block["z"] != round(block["z"])):
+                float_coords += 1
 
     if not valid_blocks:
         print("ERROR: No valid blocks found in blueprint")
         sys.exit(1)
+
+    if float_coords:
+        print(f"   WARNING: {float_coords} block(s) have non-integer coordinates (rounded to nearest int)")
 
     # Deduplicate coordinates — last placement wins (matches generator placement order)
     deduped = {}
@@ -482,7 +636,7 @@ def build_schematic(blueprint: dict, output_dir: str, config: dict) -> str:
         pct = duplicates / len(valid_blocks) * 100
         msg = f"\n   NOTE: {duplicates} duplicate coordinate(s) removed (last placement kept)"
         if pct > 10:
-            msg += f" -- {pct:.0f}% of placements were duplicates, possible generator bug"
+            msg += f" -- {pct:.0f}% of placements were overrides (normal for complex builds with air cuts or intentional layering)"
         print(msg)
     valid_blocks = list(deduped.values())
 
@@ -512,6 +666,14 @@ def build_schematic(blueprint: dict, output_dir: str, config: dict) -> str:
         print("   Large builds may exhaust memory. Split the structure into smaller sections.")
         sys.exit(1)
 
+    # Hard limit on individual dimensions to prevent memory exhaustion from extreme coordinates
+    MAX_DIMENSION = 2_000
+    for axis, key in (("X", "width"), ("Y", "height"), ("Z", "length")):
+        if bounds[key] > MAX_DIMENSION:
+            print(f"ERROR: Bounding box {axis}-dimension is {bounds[key]:,} blocks (limit {MAX_DIMENSION:,}).")
+            print("   Check for blocks with extreme coordinates in your blueprint.")
+            sys.exit(1)
+
     # Warn on large builds
     total_volume = bounds["width"] * bounds["height"] * bounds["length"]
     if total_volume > 1_000_000:
@@ -522,7 +684,8 @@ def build_schematic(blueprint: dict, output_dir: str, config: dict) -> str:
 
     start_time = time.time()
     placed = 0
-    skipped = 0
+    air_skipped = 0
+    failures = 0
     skipped_ids = {}
 
     for block in valid_blocks:
@@ -531,7 +694,7 @@ def build_schematic(blueprint: dict, output_dir: str, config: dict) -> str:
 
         # Skip air explicitly -- mcschematic treats unset blocks as air anyway
         if block_id == "minecraft:air":
-            skipped += 1
+            air_skipped += 1
             continue
 
         try:
@@ -540,7 +703,11 @@ def build_schematic(blueprint: dict, output_dir: str, config: dict) -> str:
         except Exception as e:
             base_id = block_id.split("[")[0]
             skipped_ids[base_id] = skipped_ids.get(base_id, 0) + 1
-            skipped += 1
+            failures += 1
+            if failures <= 5:
+                print(f"   WARNING: Failed to place {block_id} at ({x},{y},{z}): {e}")
+            elif failures == 6:
+                print(f"   WARNING: Further placement failures suppressed (see summary below)")
 
         # Progress every 5000 blocks
         if placed % 5000 == 0 and placed > 0:
@@ -552,15 +719,17 @@ def build_schematic(blueprint: dict, output_dir: str, config: dict) -> str:
     # Save the schematic
     os.makedirs(output_dir, exist_ok=True)
     schem.save(output_dir, name, version)
-    output_path = os.path.join(output_dir, f"{name}.schem")
+    output_path = os.path.normpath(os.path.join(output_dir, f"{name}.schem"))
 
     print(f"\nDone in {elapsed:.2f}s")
     print(f"   Blocks placed: {placed:,}")
-    if skipped:
-        print(f"   Blocks skipped: {skipped}")
+    if air_skipped:
+        print(f"   Air blocks skipped: {air_skipped} (intentional clearouts)")
+    if failures:
+        print(f"   Blocks failed: {failures}")
         if skipped_ids:
             summary = ", ".join(f"{k}({v})" for k, v in sorted(skipped_ids.items()))
-            print(f"   Skipped block types: {summary}")
+            print(f"   Failed block types: {summary}")
     print(f"\nSchematic saved: {output_path}")
 
     # Auto-copy to WorldEdit schematics folder if configured
@@ -617,8 +786,11 @@ Blueprint JSON format:
       { "x": 1, "y": 0, "z": 0, "block": "minecraft:oak_planks" }
     ]
   }
+
+Supported version values: JE_1_21_1, JE_1_20_1, JE_1_19_2, JE_1_18_2
         """
     )
+    parser.add_argument("--version", "-v", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("blueprint", help="Path to the blueprint JSON file")
     parser.add_argument(
         "--output-dir", "-o",

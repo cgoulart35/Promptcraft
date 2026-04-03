@@ -34,7 +34,7 @@ Save your blueprint as a `.json` file, then run `python build.py yourfile.json`.
 ### Fields
 - `name`: filename-safe string, used for the output `.schem` filename
 - `description`: human-readable label (logged, not used in file)
-- `version`: always use `"JE_1_21_1"` unless user specifies otherwise
+- `version`: always use `"JE_1_21_1"` unless user specifies otherwise. Supported values: `"JE_1_21_1"`, `"JE_1_20_1"`, `"JE_1_19_2"`, `"JE_1_18_2"`
 - `blocks`: array of block placements — every block in the structure
 
 ### Coordinate System
@@ -515,9 +515,11 @@ minecraft:iron_bars[north=true,south=true,east=false,west=false]
 ```
 - Panes and bars are flat by default — they need `true` on the sides that connect to adjacent blocks
 - A single pane with all sides `false` looks like a thin cross/plus — usually not what you want
-- **For windows**: set the two sides perpendicular to the wall to `true` (e.g., a window in a north/south wall: `east=true,west=true`)
+- **For windows**: set the two sides that run along the wall's face to `true` (e.g., a north/south-facing wall runs east-west, so its panes connect east/west: `east=true,west=true`)
 - **For railings/fences**: set sides that connect to adjacent panes/bars to `true`
+- **Stained glass panes** (`minecraft:red_stained_glass_pane`, etc.) follow the same rules and need all four connection directions set
 - These blocks auto-connect in-game, but schematics need explicit states
+- `build.py` auto-infers any unspecified connection directions from neighboring solid blocks — omitted directions are filled in automatically, so you only need to override specific sides
 
 ---
 
@@ -776,6 +778,11 @@ In practice, write a Python generator script for anything beyond a handful of bl
 
 ```python
 import json
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, "output")
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 blocks = []
 
@@ -798,13 +805,14 @@ blueprint = {
     "blocks": blocks
 }
 
-with open("stone_tower.json", "w") as f:
+output_file = os.path.join(OUTPUT_DIR, "stone_tower.json")
+with open(output_file, "w") as f:
     json.dump(blueprint, f, indent=2)
 
-print(f"Blueprint saved: {len(blocks)} blocks")
+print(f"Blueprint saved: {output_file} ({len(blocks)} blocks)")
 ```
 
-Then run: `python build.py stone_tower.json`
+Then run: `python build.py output/stone_tower.json`
 
 ---
 

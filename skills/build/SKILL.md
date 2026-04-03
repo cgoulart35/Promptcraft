@@ -48,7 +48,9 @@ Always write a Python generator script for anything non-trivial — never hand-w
 import json
 import os
 
-os.makedirs("output", exist_ok=True)
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, "..", "output")
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 blocks = []
 
@@ -123,7 +125,7 @@ blueprint = {
     "blocks": blocks
 }
 
-output_file = "output/<name>.json"
+output_file = os.path.join(OUTPUT_DIR, "<name>.json")
 with open(output_file, "w") as f:
     json.dump(blueprint, f, indent=2)
 
@@ -189,7 +191,7 @@ Before generating the final blueprint, verify each item:
 - [ ] **Windows look right** — glass panes have connection states set (`east=true,west=true` etc.)
 - [ ] **Leaves have `persistent=true`** — without it, leaves decay and vanish in-game within minutes
 - [ ] **No block conflicts** — ladder holes cut through floors, torches not overwritten by later blocks
-- [ ] **Placement order** — foundation → walls → roof → openings → doors → furniture → lighting → decorations
+- [ ] **Placement order** — foundation → walls → roof → openings → doors → floor holes → ladders → furniture → lighting → decorations
 - [ ] **At least 2-3 materials** — no single-material walls; mix in accent blocks
 - [ ] **Lighting coverage** — no large dark interior areas; place torches/lanterns every 6-8 blocks
 

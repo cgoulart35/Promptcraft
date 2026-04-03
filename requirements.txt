@@ -1,1 +1,1 @@
-mcschematic==11.4.4
+mcschematic>=11.4.4,<12

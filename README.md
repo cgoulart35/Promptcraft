@@ -188,4 +188,4 @@ All rights reserved. This project is not currently licensed for redistribution o
 
 ---
 
-*Built with [Claude Code](https://claude.ai/code) · [promptcraft.dev](https://promptcraft.dev) · [@promptcraft](https://x.com/promptcraft)*
+*Built with [Claude Code](https://claude.ai/code) · [promptcraft.dev](https://promptcraft.dev)*

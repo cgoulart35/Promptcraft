@@ -11,6 +11,8 @@ Then: python build.py output/watchtower.json
 import json
 import os
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 blocks = []
 
 def add(x, y, z, block):
@@ -148,6 +150,11 @@ add(W-2, 6, 1, "minecraft:furnace[facing=west,lit=false]")
 
 # Second floor (Y=11, on top of spruce floor at Y=10): quarters
 add(W-2, 11, D-2, "minecraft:chest[facing=west]")
+# Two beds — guards' sleeping quarters (facing=north: foot is one block south of head)
+add(2, 11, 4, "minecraft:red_bed[facing=north,part=head]")
+add(2, 11, 5, "minecraft:red_bed[facing=north,part=foot]")
+add(4, 11, 4, "minecraft:red_bed[facing=north,part=head]")
+add(4, 11, 5, "minecraft:red_bed[facing=north,part=foot]")
 
 # ═══════════════════════════════════════════════════════════════
 # Phase 8: Lighting (placed late so nothing overwrites them)
@@ -164,8 +171,8 @@ add(door_x + 1, 3, 1, "minecraft:wall_torch[facing=south]")
 wall_torches = [
     # Floor 1 (above Y=5 floor)
     # Note: (1,y,1) is the ladder column — use west wall instead
-    (1, 7, 2, "east"), (W-2, 7, 1, "south"),       # west wall / north wall
-    (1, 7, D-2, "north"), (W-2, 7, D-2, "north"),   # south wall
+    (1, 7, 2, "east"), (W-2, 7, 1, "south"),       # support on west wall / support on north wall
+    (1, 7, D-2, "north"), (W-2, 7, D-2, "north"),   # support on south wall
     # Floor 2 (above Y=10 floor)
     (1, 12, 2, "east"), (W-2, 12, 1, "south"),
     (1, 12, D-2, "north"), (W-2, 12, D-2, "north"),
@@ -187,12 +194,12 @@ blueprint = {
     "blocks": blocks
 }
 
-os.makedirs("output", exist_ok=True)
-output_file = "output/watchtower.json"
+os.makedirs(os.path.join(SCRIPT_DIR, "output"), exist_ok=True)
+output_file = os.path.join(SCRIPT_DIR, "output", "watchtower.json")
 with open(output_file, "w") as f:
     json.dump(blueprint, f, indent=2)
 
 print(f"Blueprint generated: {output_file}")
 print(f"   Total blocks: {len(blocks)}")
-print(f"   Dimensions: {W}W x {H}H x {D}D")
-print(f"\nNext step: python build.py {output_file}")
+print(f"   Dimensions: {W}W x {H}H x {D}L")
+print(f"\nNext step: python build.py output/watchtower.json")

@@ -25,14 +25,14 @@ Promptcraft requires Python 3.8 or higher. If the version is lower or `python` i
 ## Step 2 — Install dependencies
 
 ```bash
-python -m pip install mcschematic
+python -m pip install -r requirements.txt
 ```
 
 This is idempotent — pip will skip the install if mcschematic is already up to date.
 
 If pip fails (permissions error), try:
 ```bash
-python -m pip install --user mcschematic
+python -m pip install --user -r requirements.txt
 ```
 
 ---
@@ -49,11 +49,7 @@ If this fails, tell the user exactly what went wrong. Common fix: `python -m pip
 
 ## Step 4 — Configure the WorldEdit schematics path
 
-Check if `config.json` already exists:
-
-```bash
-cat config.json
-```
+Check if `config.json` already exists by reading it with the Read tool (or `python -c "import json; print(json.dumps(json.load(open('config.json')), indent=2))"` as a fallback).
 
 **If config.json exists and has a non-empty `schematics_dir`:**
 
